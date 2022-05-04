@@ -1,0 +1,74 @@
+<script>
+    import AuthenticatedLayout, { title } from '@/Layouts/Authenticated'
+    import { inertia, useForm, page } from '@inertiajs/inertia-svelte'
+    import { route, checkRole, checkPermission } from '@/Utils'
+    import { _ } from 'svelte-i18n'
+
+    import Form from './Form'
+
+    export let errors
+    export let evento
+    export let institucionEducativa
+
+    $: $title = 'Editar evento'
+
+    /**
+     * Permisos
+     */
+    let authUser = $page.props.auth.user
+    let isSuperAdmin = checkRole(authUser, [1])
+
+    let sending = false
+    let form = useForm({
+        _method: 'put',
+        nombre: evento.nombre,
+        ubicacion: evento.ubicacion,
+        descripcion: evento.descripcion,
+        fecha_inicio: evento.fecha_inicio,
+        fecha_finalizacion: evento.fecha_finalizacion,
+        link_registro: evento.link_registro,
+        info_link: evento.info_link,
+        objetivos: evento.objetivos,
+        cronograma: evento.cronograma,
+        imagen_principal: null,
+        afiche: null,
+    })
+
+    function submit() {
+        if (isSuperAdmin || checkPermission(authUser, [15])) {
+            $form.post(route('instituciones-educativas.eventos.update', [institucionEducativa.id, evento.id]), {
+                onStart: () => (sending = true),
+                onFinish: () => (sending = false),
+                preserveScroll: true,
+            })
+        }
+    }
+</script>
+
+<AuthenticatedLayout>
+    <header slot="header" class="bg-white">
+        <div class="flex items-center justify-between max-w-7xl mx-auto py-6">
+            <div>
+                <h1>
+                    <a use:inertia href={route('instituciones-educativas.eventos.index', institucionEducativa.id)} class="text-gray-500 hover:text-gray-600"> Eventos </a>
+                    <span class="text-gray-500 font-medium">/</span>
+                    Editar
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-3 gap-6 my-20">
+        <div class="col-span-1">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Información del evento</h3>
+            <p class="mt-1 text-sm text-gray-600">Ingrese nueva información para editar el evento.</p>
+            <figure class="mt-10 mb-10">
+                <span class="font-medium">Imagen principal</span>
+                <img class="mx-auto" src={'/storage/' + evento.imagen_principal} alt="Foto {evento.nombre}" />
+            </figure>
+        </div>
+        <div class="bg-white rounded shadow col-span-2">
+            <Form {errors} {authUser} {submit} {evento} method="put" {sending} {form} />
+        </div>
+    </div>
+</AuthenticatedLayout>
