@@ -19,6 +19,7 @@ class CreateEventosTable extends Migration
             $table->string('link_registro');
             $table->string('info_link');
             $table->timestamps();
+            
         });
     }
 

@@ -78,11 +78,21 @@
                             <Button on:click={() => Inertia.visit(route('dashboard-empresa'))} variant="outlined" class="p-2 w-full">Panel empresarial</Button>
                         </li>
                     {/if}
+                    {#if isSuperAdmin || checkPermission(authUser, [19, 20, 21, 22, 23, 24, 25, 26])}
+                        <li>
+                            <Button on:click={() => Inertia.visit(route('entegubernamental.index'))} variant="outlined" class="p-2 w-full">Administracion Gubernamental</Button>
+                        </li>
+                    {/if}
+                    {#if isSuperAdmin || checkPermission(authUser, [19, 20, 21, 22, 23, 24, 25, 26])}
+                        <li>
+                            <Button on:click={() => Inertia.visit(route('entegubernamental.login'))} variant="outlined" class="p-2 w-full">Administracion Gubernamental LOGINNNN</Button>
+                        </li>
+                    {/if}
                 </ul>
             {/if}
 
             {#if !isSuperAdmin && authUser.empresa_id == null && authUser.institucion_educativa_id == null}
-                <InfoMessage class="mt-4" alertMsg={true}>No está asignado a ninguna empresa o institución educativa, por favor comuníquese con algún administrador.</InfoMessage>
+                <InfoMessage class="mt-4" alertMsg={true}>No está asignado a ninguna  empresa o institución educativa, por favor comuníquese con algún administrador.</InfoMessage>
             {/if}
         </div>
         <div slot="actions">

@@ -29,6 +29,7 @@ use App\Http\Controllers\ConvocatoriaController;
 use App\Http\Controllers\EventoRredsiDepartamentalController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RespuestaController;
+use App\Http\Controllers\EnteGubernamentalController;
 use App\Models\Proyecto;
 use Illuminate\Support\Facades\Route;
 
@@ -262,6 +263,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/users/actualizar-perfil', [UserController::class, 'actualizarPerfil'])->name('users.actualizar-perfil');
 
     Route::resource('users', UserController::class);
+
+
+    /**
+     * Ente Gubernamental
+     *
+     */
+    Route::resource('/entegubernamental', EnteGubernamentalController::class)->parameters(['entegubernamental' => 'entegubernamental']);
+    Route::get('/users/actualizar-perfil', [EnteGubernamentalController::class, 'login'])->name('entegubernamental.login');
+    //Route::get('/entegubernamental', [EnteGubernamentalController::class, 'create'])->name('entegubernamental.create');
+    Route::post('/entegubernamental', [EnteGubernamentalController::class, 'loginEnte'])->name('entegubernamental.loginEnte');
+
+    //Formulario
+    Route::put('/entegubernamental', [EnteGubernamentalController::class, 'store'])->name('entegubernamental.store');
+
+    //Show
+    Route::get('entegubernamental', [EnteGubernamentalController::class, 'show'])->name('entegubernamental.show');
+
 });
 
 require __DIR__ . '/auth.php';
