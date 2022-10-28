@@ -14,7 +14,7 @@ class EnteGubernamental extends Model
      *
      * @var string
      */
-    protected $table = 'entegubernamental';
+    protected $table = 'entidad_Gubernamental';
 
     /**
      * The attributes that are mass assignable.
@@ -22,11 +22,13 @@ class EnteGubernamental extends Model
      * @var array
      */
     protected $fillable = [
-        'nombre',
+        'id',
+        'name',
+        'direction',
+        'phone',
         'nit',
-        'telefono',
-        'ciudad',
-        'direccion'
+        'city',
+        'id_delegado_entidad'
 
     ];
 

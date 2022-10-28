@@ -2,154 +2,145 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Controllers\Controller;
 use App\Models\EnteGubernamental;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class EnteGubernamentalController extends Controller
 {
-    //
+
     public function index()
     {
-        return Inertia::render('EnteGubernamental/Index');
-    }
-    public function login(){
-        return Inertia::render('EnteGubernamental/Login');
-    }
-
-    public function loginEnte(Request $request){
-
-        $email = $request ->email ;
-        $pass = $request ->password;
-
-        var_dump($email);
-
-        $exist = User::where('email', '=', $email)->exists();
-
-        if ($exist) {
-            return Inertia::render('EnteGubernamental/Index',);
-        }
-        else {
-            return back()->with('error', 'verifique la información ingresada.');
-        }
+        return Inertia::render('EnteGubernamental/Index', [
+            'filters'   => request()->all('search'),
+            'entes'     => EnteGubernamental::orderBy('name', 'ASC')
+                ->FilterEnteGubernamental(request()->only('search'))->paginate(),
+        ]);
     }
 
-    public function create(){
-        return Inertia::render('EnteGubernamental/Create',);
-    }
-
-
-    /*
-    public function formulary(Request $request){
-
-        $entityName = $request ->email;
-        $nit = $request ->password;
-
-        $phone = $request ->email ;
-        $city = $request ->password;
-        $direction = $request ->email ;
-
-        $managerName = $request ->password;
-        $document = $request ->email ;
-        $phoneNumber = $request ->password;
-        $email = $request ->email ;
-        $password = $request ->password;
-
-        var_dump($email);
-
-        $exist = User::where('email', '=', $email)->exists();
-
-        if ($exist) {
-            return Inertia::render('EnteGubernamental/Index',);
-        }
-        else {
-            return back()->with('error', 'verifique la información ingresada.');
-        }
-
-    }
-
-    */
-
-
-    public function store(Request $request){
-
-        $nombre    = $request->nombreEntidad;
-        $nit       = $request->nit;
-        $telefono  = $request->telefono;
-        $ciudad    = $request->ciudad;
-        $direccion = $request->direccion;
-
-        $entidad = new EnteGubernamental();
-        $entidad->nombre = $nombre;
-        $entidad->nit = $nit;
-        $entidad->telefono = $telefono;
-        $entidad->ciudad = $ciudad;
-        $entidad->direccion = $direccion;
-
-    
-
-        $entidad->save();
-
-        return Inertia::render('EnteGubernamental/index');
-
-
-        /*
-        $EnteGubernamental = new EnteGubernamental();
-        $EnteGubernamental->nombreEntidad        = $request->nombreEntidad;
-        $EnteGubernamental->nit                  = $request->nit;
-        $EnteGubernamental->telefono             = $request->telefono;
-        $EnteGubernamental->ciudad               = $request->ciudad;
-        $EnteGubernamental->direccion            = $request->direccion;
-
-        $EnteGubernamental -> save();
-
-        return Inertia::render('EnteGubernamental/Show');
-        */
-    }
-
-
-    //Capturar datos
-        /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    /*
-     public function store2(entegubernamentalRequest $request)
+    public function create()
     {
-        $this->authorize('create', [EnteGubernamental::class]);
+        return Inertia::render('EnteGubernamental/Create', [
+            'municipios'     => DB::select('select id,municipio from municipios'),
+            'delegados'  => DB::table('users')
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->select('users.name', 'users.id')
+                ->where('roles.name', '=', 'Delegado de la entidad')
+                ->get()
+        ]);
+    }
 
-        $EnteGubernamental = new EnteGubernamental();
-        $EnteGubernamental->nombreEntidad        = $request->nombreEntidad;
-        $EnteGubernamental->nit                  = $request->nit;
-        $EnteGubernamental->telefono             = $request->detalles;
-        $EnteGubernamental->ciudad               = $request->fecha_inicio;
-        $EnteGubernamental->direccion            = $request->fecha_finalizacion;
+    public function store(Request $request)
+    {
+
+        $name = $request->name;
+        $direction = $request->direction;
+        $phone = $request->phone;
+        $nit = $request->nit;
+        $city = $request->city;
+        $id_delegado_entidad = $request->id_delegado_entidad;
+
+        $entidadGubernamental = new EnteGubernamental();
+        $entidadGubernamental->name = $name;
+        $entidadGubernamental->direction = $direction;
+        $entidadGubernamental->phone = $phone;
+        $entidadGubernamental->nit = $nit;
+        $entidadGubernamental->city = $city;
+        $entidadGubernamental->id_delegado_entidad = $id_delegado_entidad;
+
+        $entidadGubernamental->save();
+
+        return redirect()->route('ente-gubernamental.index')->with('success', 'El recurso se ha creado correctamente.');
+    }
+
+    public function edit($id)
+    {
+
+        /* $ente = EnteGubernamental::where('id', $id)->first();
+        var_dump($ente); */
+
+        return Inertia::render('EnteGubernamental/Edit', [
+            'filters'   => request()->all('search'),
+            'ente'      => EnteGubernamental::where('id', $id)
+                ->FilterEnteGubernamental(request()->only('search'))->paginate(),
+        ]);
 
 
-        if ($EnteGubernamental->save()) {
-            return redirect()->back()->with('success', 'Ente Gubernamentl agregado con exito');
+
+    }
+
+    public function update(Request $request, EnteGubernamental $ente)
+    {
+
+        $ente -> name   = $request -> name;
+        $ente -> direction   = $request -> direccion;
+        $ente -> phone   = $request -> phone;
+        $ente -> nit   = $request -> nit;
+        $ente -> city   = $request -> city;
+        $ente -> id_delegado_entidad   = $request -> id_delegado_entidad;
+
+
+        $idEntidad =$request->idEntidad ;
+
+        EnteGubernamental::where('id', $idEntidad)
+        ->update([
+                'name' => $request->name,
+                'direction' => $request->direction,
+                'phone' => $request->phone,
+                'nit' => $request->nit,
+                'city' => $request->city,
+                'id_delegado_entidad' => $request->id_delegado_entidad,
+        ]);
+        return redirect()->route('ente-gubernamental.index')->with('success', 'El recurso se ha Actualizado correctamente.');
+
+    }
+
+    public function loguin()
+    {
+        return Inertia::render('EnteGubernamental/Login', [
+            'filters'   => request()->all('search'),
+            'entes'     => EnteGubernamental::orderBy('name', 'ASC')
+                ->FilterEnteGubernamental(request()->only('search'))->paginate(),
+        ]);
+    }
+
+    public function log(Request $request)
+    {
+
+
+        $email = $request->email;
+        $pass = $request->password;
+        $dbPass = User::select('password')->where('email', '=', $email)->first();
+
+        if (Hash::check($pass, $dbPass->password)) {
+            return Inertia::render('EnteGubernamental/Index', [
+                'filters'   => request()->all('search'),
+                'entes'     => EnteGubernamental::orderBy('name', 'ASC')
+                    ->FilterEnteGubernamental(request()->only('search'))->paginate(),
+            ]);
         } else {
-
-            return redirect()->back()->with('error', 'Hubo un error al agregar al Ente Gubernamental');
+            return Inertia::render('EnteGubernamental/Login')->with('error', 'Error.');
         }
     }
 
-    */
+    public function destroy($ide)
+    {
+        $ide;
+        $exist = EnteGubernamental::where('id', '=', $ide)->exists();
 
-    public function show(){
-
-        return Inertia::render('EnteGubernamental/Show');
-
+        if ($exist) {
+            EnteGubernamental::where('id', $ide)->delete();
+            return redirect()->route('ente-gubernamental.index')->with('success', 'El recurso se ha eliminado correctamente.');
+        } else {
+            return redirect()->route('ente-gubernamental.index')->with('error', 'El recurso no existe.');
+        }
     }
-
-
-
 
 
 }

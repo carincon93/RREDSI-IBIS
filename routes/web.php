@@ -30,6 +30,7 @@ use App\Http\Controllers\EventoRredsiDepartamentalController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\EnteGubernamentalController;
+use App\Http\Controllers\DependenciaController;
 use App\Models\Proyecto;
 use Illuminate\Support\Facades\Route;
 
@@ -269,16 +270,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
      * Ente Gubernamental
      *
      */
-    Route::resource('/entegubernamental', EnteGubernamentalController::class)->parameters(['entegubernamental' => 'entegubernamental']);
-    Route::get('/users/actualizar-perfil', [EnteGubernamentalController::class, 'login'])->name('entegubernamental.login');
-    //Route::get('/entegubernamental', [EnteGubernamentalController::class, 'create'])->name('entegubernamental.create');
-    Route::post('/entegubernamental', [EnteGubernamentalController::class, 'loginEnte'])->name('entegubernamental.loginEnte');
+    Route::resource('ente-gubernamental', EnteGubernamentalController::class)->parameters(['ente-gubernamental' => 'ente-gubernamental']);
 
-    //Formulario
-    Route::put('/entegubernamental', [EnteGubernamentalController::class, 'store'])->name('entegubernamental.store');
+    /**
+     * Dependencia de las entidades
+     *
+     */
+    Route::resource('dependencia', DependenciaController::class)->parameters(['dependencia' => 'dependencia']);
 
-    //Show
-    Route::get('entegubernamental', [EnteGubernamentalController::class, 'show'])->name('entegubernamental.show');
 
 });
 

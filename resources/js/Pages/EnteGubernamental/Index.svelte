@@ -1,6 +1,6 @@
 <script>
     import AuthenticatedLayout, { title } from '@/Layouts/Authenticated'
-    import { page } from '@inertiajs/inertia-svelte'
+    import { page, inertia } from '@inertiajs/inertia-svelte'
     import { route, checkRole, checkPermission } from '@/Utils'
     import { _ } from 'svelte-i18n'
     import { Inertia } from '@inertiajs/inertia'
@@ -11,26 +11,32 @@
     import DataTableMenu from '@/Shared/DataTableMenu'
     import Dialog from '@/Shared/Dialog'
     import { Item, Text } from '@smui/list'
-    import NavEmpresarial from '../DashboardEmpresa/NavEmpresarial'
 
-    //export let convocatorias
-    //export let users
+    /*
+    export let institucionEducativa
+    export let users
+    */
+    export let semilleroInvestigacion = null
+    export let entes
 
     $title = 'Ente Gubernamental'
 
     /**
      * Permisos
      */
+
     let authUser = $page.props.auth.user
     let isSuperAdmin = checkRole(authUser, [1])
 
     let filters = {}
     let dialogOpen = false
-    let convocatoriaId
+    let IdEnte
+
 
     function destroy() {
-        if (isSuperAdmin || checkPermission(authUser, [19])) {
-            Inertia.delete(route('convocatorias.destroy', [convocatoriaId]), {
+        if (isSuperAdmin || checkPermission(authUser, [17, 23])) {
+            let ide = IdEnte
+            Inertia.delete(route('ente-gubernamental.destroy', ide), {
                 onSuccess: () => (dialogOpen = false),
             })
         }
@@ -38,65 +44,56 @@
 </script>
 
 <AuthenticatedLayout>
-    {#if authUser.empresa_id}
-        <NavEmpresarial />
-    {/if}
-    <div class="my-20 ml-20">
-        <DataTable>
-            <div slot="title">Entes Gubernamentales</div>
+    <DataTable>
+        <div slot="title">Entes Gubernamentales</div>
+        <div slot="actions">
+            {#if isSuperAdmin || checkPermission(authUser, [17, 23])}
+                <Button on:click={() => Inertia.visit(route('ente-gubernamental.create'))} variant="raised" class="bg-gray-500">Crear Ente Gubernamental</Button>
+                <Button on:click={() => Inertia.visit(route('dependencia.index'))} variant="raised" class="bg-gray-500">Ir a Dependencias</Button>
+            {/if}
+        </div>
 
-            <div slot="actions">
-                {#if isSuperAdmin || checkPermission(authUser, [19])}
-                    <Button on:click={() => Inertia.visit(route('entegubernamental.create'))} variant="raised" class="bg-gray-500">Crear Ente Gubernamental</Button>
-                {/if}
-            </div>
-
-
-
-            <tbody slot="tbody" class="grid grid-cols-3 gap-3">
-                <!-- {#each convocatorias.data as convocatoria (convocatoria.id)}
-                    <tr class="hover:bg-gray-100 focus-within:bg-gray-100 shadow flex items-center">
-                        <td>
-                            <div class="grid grid-cols-4">
-                                <div class="col-span-3">
-                                    <p class="px-6 py-4 focus:text-gray-500 first-letter-uppercase">
-                                        {convocatoria.nombre}
-                                    </p>
-                                </div>
-                                <div class="flex justify-center items-center">
-                                    <DataTableMenu class={convocatorias.data.length < 4 ? 'z-50' : ''}>
-                                        {#if isSuperAdmin || checkPermission(authUser, [20])}
-                                            <Item on:SMUI:action={() => Inertia.visit(route('convocatorias.show', [convocatoria.id]))}>
-                                                <Text>Ver detalles</Text>
-                                            </Item>
-                                        {/if}
-                                        {#if isSuperAdmin || (authUser.id == convocatoria.autor_id && checkPermission(authUser, [19]))}
-                                            <Item on:SMUI:action={() => Inertia.visit(route('convocatorias.edit', [convocatoria.id]))}>
-                                                <Text>Editar</Text>
-                                            </Item>
-                                        {/if}
-                                        {#if isSuperAdmin || (authUser.id == convocatoria.autor_id && checkPermission(authUser, [19]))}
-                                            <Item on:SMUI:action={() => ((convocatoriaId = convocatoria.id), (dialogOpen = true))}>
-                                                <Text>Eliminar</Text>
-                                            </Item>
-                                        {/if}
-                                    </DataTableMenu>
-                                </div>
+        <tbody slot="tbody" class="grid grid-cols-3 gap-3">
+            {#each entes['data'] as ente (ente.id)}
+                <tr class="hover:bg-gray-100 focus-within:bg-gray-100 shadow flex items-center">
+                    <td>
+                        <div class="grid grid-cols-4">
+                            <div class="col-span-3">
+                                <p class="px-6 py-4 focus:text-gray-500 first-letter-uppercase">
+                                    {ente.name}
+                                </p>
                             </div>
-                        </td>
-                    </tr>
-                {/each}
+                            <div class="flex justify-center items-center">
+                                <DataTableMenu class={ente.length < 4 ? 'z-50' : ''}>
+                                    {#if isSuperAdmin || checkPermission(authUser, [18, 24])}
+                                        <Item on:SMUI:action={() => Inertia.visit(route('users.show' /* [user.id, 'institucionEducativaId=' + institucionEducativa?.id, 'semilleroId=' + semilleroInvestigacion?.id] */))}>
+                                            <Text>Ver detalles</Text>
+                                        </Item>
+                                    {/if}
+                                    {#if isSuperAdmin || checkPermission(authUser, [17, 23])}
+                                        <Item on:SMUI:action={() => Inertia.visit(route('ente-gubernamental.edit',ente.id ))}>
+                                            <Text>Editar</Text>
+                                        </Item>
+                                    {/if}
+                                    {#if isSuperAdmin || checkPermission(authUser, [17, 23])}
+                                        <Item on:SMUI:action={() => ((IdEnte= ente.id), (dialogOpen = true))}>
+                                            <Text>Eliminar</Text>
+                                        </Item>
+                                    {/if}
+                                </DataTableMenu>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {/each}
 
-                {#if convocatorias.data.length === 0}
-                    <tr>
-                        <td class="px-6 py-4" colspan="4"> Sin información registrada </td>
-                    </tr>
-                {/if} -->
-            </tbody>
-        </DataTable>
-        <!-- <Pagination links={convocatorias.links} /> -->
-    </div>
-
+            {#if entes['data'].length === 0}
+                <tr>
+                    <td class="px-6 py-4" colspan="4"> Sin información registrada </td>
+                </tr>
+            {/if}
+        </tbody>
+    </DataTable>
     <Dialog bind:open={dialogOpen}>
         <div slot="title" class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

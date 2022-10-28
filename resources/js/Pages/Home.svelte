@@ -78,16 +78,12 @@
                             <Button on:click={() => Inertia.visit(route('dashboard-empresa'))} variant="outlined" class="p-2 w-full">Panel empresarial</Button>
                         </li>
                     {/if}
-                    {#if isSuperAdmin || checkPermission(authUser, [19, 20, 21, 22, 23, 24, 25, 26])}
+                    {#if isSuperAdmin || authUser.empresa_id}
                         <li>
-                            <Button on:click={() => Inertia.visit(route('entegubernamental.index'))} variant="outlined" class="p-2 w-full">Administracion Gubernamental</Button>
+                            <Button on:click={() => Inertia.visit(route('ente-gubernamental.index'))} variant="outlined" class="p-2 w-full">Ente Gubernamental</Button>
                         </li>
                     {/if}
-                    {#if isSuperAdmin || checkPermission(authUser, [19, 20, 21, 22, 23, 24, 25, 26])}
-                        <li>
-                            <Button on:click={() => Inertia.visit(route('entegubernamental.login'))} variant="outlined" class="p-2 w-full">Administracion Gubernamental LOGINNNN</Button>
-                        </li>
-                    {/if}
+
                 </ul>
             {/if}
 
