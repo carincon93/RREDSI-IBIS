@@ -8,7 +8,7 @@
 
 "RREDSI-Ibis: Fortaleciendo la Investigación Académica en Caldas"
 
-La plataforma RREDSI-Ibis ofrece una solución integral para potenciar la investigación académica en Caldas. Ahora, puede buscar proyectos de interés en los semilleros de investigación de las dos instituciones educativas afiliadas a RREDSI Caldas y colaborar en su desarrollo. También puede registrar su propio proyecto y conectar con jóvenes investigadores de otras instituciones.
+La plataforma RREDSI-Ibis ofrece una solución integral para potenciar la investigación académica en Caldas. Ahora, puede buscar proyectos de interés en los semilleros de investigación de las instituciones educativas afiliadas a RREDSI Caldas y colaborar en su desarrollo. También puede registrar su propio proyecto y conectar con jóvenes investigadores de otras instituciones.
 
 Con RREDSI-Ibis, fortalezca los resultados de su proyecto al colaborar con jóvenes investigadores de diversas áreas y establecimientos educativos. Encuentre proyectos afines y trabaje de forma colaborativa con otros semilleros de investigación.
 
